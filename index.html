@@ -33,6 +33,10 @@
             color: #4f46e5;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
+        .lang-active {
+            background-color: #4f46e5;
+            color: white;
+        }
     </style>
 </head>
 <body class="min-h-screen text-slate-900 pb-12">
@@ -45,10 +49,21 @@
                     <div class="p-1.5 bg-indigo-600 rounded-lg text-white">
                         <i data-lucide="users" class="w-5 h-5"></i>
                     </div>
-                    <span class="font-black text-xl tracking-tight text-slate-800 uppercase">Couple<span class="text-indigo-600">Thrive</span></span>
+                    <span class="font-black text-xl tracking-tight text-slate-800 uppercase">
+                        <span id="txt-appTitle1">Couple</span><span id="txt-appTitle2" class="text-indigo-600">Thrive</span>
+                    </span>
                 </div>
-                <div class="text-[10px] font-bold text-slate-400 bg-slate-100 px-3 py-1.5 rounded-full tracking-widest uppercase">
-                    We Wakeup At 5A.M Every Day And Go To Bed Early!
+                
+                <div class="flex items-center gap-4">
+                    <div class="hidden md:block text-[10px] font-bold text-slate-400 bg-slate-100 px-3 py-1.5 rounded-full tracking-widest uppercase" id="txt-subtitle">
+                        We Wakeup At 5A.M Every Day And Go To Bed Early!
+                    </div>
+                    <!-- Language Selector -->
+                    <div class="flex bg-slate-100 p-1 rounded-lg text-[10px] font-bold">
+                        <button onclick="changeLang('en')" id="lang-en" class="px-2 py-1 rounded transition-all">EN</button>
+                        <button onclick="changeLang('my')" id="lang-my" class="px-2 py-1 rounded transition-all">MY</button>
+                        <button onclick="changeLang('ja')" id="lang-ja" class="px-2 py-1 rounded transition-all">JA</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -72,18 +87,18 @@
             <div class="bg-slate-900 rounded-3xl shadow-xl p-8 text-white flex flex-col sm:flex-row justify-between items-center gap-6 border border-slate-800">
                 <div class="flex items-center gap-10">
                     <div>
-                        <p class="text-slate-400 text-[10px] mb-2 uppercase tracking-[0.2em] font-black">Total Sessions</p>
+                        <p class="text-slate-400 text-[10px] mb-2 uppercase tracking-[0.2em] font-black" id="txt-totalSessions">Total Sessions</p>
                         <p id="stat-count" class="text-4xl font-black">0</p>
                     </div>
                     <div class="w-px h-12 bg-slate-800 hidden sm:block"></div>
                     <div>
-                        <p class="text-slate-400 text-[10px] mb-2 uppercase tracking-[0.2em] font-black">Effort Time</p>
+                        <p class="text-slate-400 text-[10px] mb-2 uppercase tracking-[0.2em] font-black" id="txt-effortTime">Effort Time</p>
                         <p id="stat-time" class="text-4xl font-black text-indigo-400">0m</p>
                     </div>
                 </div>
                 <div class="text-right flex flex-col items-center sm:items-end">
                     <p id="active-user-label" class="text-indigo-400 text-sm font-black uppercase tracking-widest mb-1">Family View</p>
-                    <p class="text-slate-500 text-[10px] leading-relaxed font-medium max-w-[200px] text-center sm:text-right">
+                    <p class="text-slate-500 text-[10px] leading-relaxed font-medium max-w-[200px] text-center sm:text-right" id="txt-motto">
                         Two hours of focus, a lifetime of growth together.
                     </p>
                 </div>
@@ -92,7 +107,7 @@
             <!-- Content: Grouped Activity Log -->
             <div>
                 <div class="flex items-center justify-between mb-8">
-                    <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tight">Timeline</h2>
+                    <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tight" id="txt-timeline">Timeline</h2>
                     <span id="entry-count-label" class="text-[10px] font-black text-indigo-600 bg-indigo-50 px-4 py-1.5 rounded-full border border-indigo-100 uppercase tracking-widest"></span>
                 </div>
 
@@ -105,7 +120,7 @@
                     <div class="p-6 bg-slate-50 rounded-full mb-4">
                         <i data-lucide="calendar" class="w-12 h-12 text-slate-300"></i>
                     </div>
-                    <p class="text-slate-500 font-bold uppercase tracking-widest text-xs">No activity found for this filter</p>
+                    <p class="text-slate-500 font-bold uppercase tracking-widest text-xs" id="txt-noActivity">No activity found for this filter</p>
                 </div>
             </div>
         </div>
@@ -113,8 +128,99 @@
 
     <script>
         /**
+         * LANGUAGE TRANSLATIONS
+         */
+        const translations = {
+            en: {
+                appTitle1: "Couple",
+                appTitle2: "Thrive",
+                subtitle: "We Wakeup At 5A.M Every Day And Go To Bed Early!",
+                Family: "Family",
+                Me: "Me",
+                Wife: "Wife",
+                totalSessions: "Total Sessions",
+                effortTime: "Effort Time",
+                FamilyView: "Family View",
+                MeView: "Me View",
+                WifeView: "Wife View",
+                motto: "Two hours of focus, a lifetime of growth together.",
+                timeline: "Timeline",
+                sessions: "sessions",
+                noActivity: "No activity found for this filter",
+                duration: "Duration",
+                types: {
+                    coding: "Coding",
+                    meditation: "Meditation",
+                    walking: "Walking",
+                    running: "Running",
+                    learning: "Learning",
+                    strength: "Strength",
+                    cardio: "Cardio",
+                    workout: "Workout"
+                }
+            },
+            my: {
+                appTitle1: "ဇနီးမောင်နှံ",
+                appTitle2: "တိုးတက်ရေး",
+                subtitle: "မနက် ၅ နာရီတိုင်းထပြီး စောစောအိပ်ကြသည်!",
+                Family: "မိသားစု",
+                Me: "ကျွန်ုပ်",
+                Wife: "ဇနီး",
+                totalSessions: "စုစုပေါင်းအကြိမ်",
+                effortTime: "စုစုပေါင်းကြာချိန်",
+                FamilyView: "မိသားစုမြင်ကွင်း",
+                MeView: "ကျွန်ုပ်၏မြင်ကွင်း",
+                WifeView: "ဇနီး၏မြင်ကွင်း",
+                motto: "အာရုံစူးစိုက်မှု နှစ်နာရီ၊ တစ်သက်တာ တိုးတက်မှု။",
+                timeline: "အချိန်မှတ်တမ်း",
+                sessions: "ကြိမ်",
+                noActivity: "ဤစစ်ထုတ်မှုအတွက် မှတ်တမ်းမရှိပါ",
+                duration: "ကြာချိန်",
+                types: {
+                    coding: "ကုဒ်ရေးခြင်း",
+                    meditation: "တရားထိုင်ခြင်း",
+                    walking: "လမ်းလျှောက်ခြင်း",
+                    running: "ပြေးခြင်း",
+                    learning: "လေ့လာခြင်း",
+                    strength: "အလေးမခြင်း",
+                    cardio: "နှလုံးကျန်းမာရေးလေ့ကျင့်ခန်း",
+                    workout: "လေ့ကျင့်ခန်း"
+                }
+            },
+            ja: {
+                appTitle1: "カップル",
+                appTitle2: "スライヴ",
+                subtitle: "毎朝5時に起きて、早寝早起きを徹底！",
+                Family: "家族",
+                Me: "自分",
+                Wife: "妻",
+                totalSessions: "合計セッション",
+                effortTime: "努力時間",
+                FamilyView: "家族ビュー",
+                MeView: "自分ビュー",
+                WifeView: "妻ビュー",
+                motto: "2時間の集中が、共に歩む一生の成長につながる。",
+                timeline: "タイムライン",
+                sessions: "セッション",
+                noActivity: "アクティビティはありません",
+                duration: "時間",
+                types: {
+                    coding: "コーディング",
+                    meditation: "瞑想",
+                    walking: "ウォーキング",
+                    running: "ランニング",
+                    learning: "学習",
+                    strength: "筋トレ",
+                    cardio: "有酸素運動",
+                    workout: "ワークアウト"
+                }
+            }
+        };
+
+        let currentLang = 'en';
+
+        /**
          * MANUAL DATA ENTRY
-         * Added 'user' field: 'Me' or 'Wife'
          */
         const memory = [
             // FEBRUARY
@@ -142,6 +248,11 @@
             renderMemories();
         };
 
+        function changeLang(lang) {
+            currentLang = lang;
+            renderMemories();
+        }
+
         function changeUser(user) {
             currentUser = user;
             renderMemories();
@@ -154,11 +265,40 @@
             icon.classList.toggle('rotated');
         }
 
+        function t(key) {
+            return translations[currentLang][key] || key;
+        }
+
+        function getTranslatedType(type) {
+            const typeKey = type.toLowerCase();
+            return translations[currentLang].types[typeKey] || type;
+        }
+
+        function updateStaticTexts() {
+            document.getElementById('txt-appTitle1').innerText = t('appTitle1');
+            document.getElementById('txt-appTitle2').innerText = t('appTitle2');
+            document.getElementById('txt-subtitle').innerText = t('subtitle');
+            document.getElementById('btn-Family').innerText = t('Family');
+            document.getElementById('btn-Me').innerText = t('Me');
+            document.getElementById('btn-Wife').innerText = t('Wife');
+            document.getElementById('txt-totalSessions').innerText = t('totalSessions');
+            document.getElementById('txt-effortTime').innerText = t('effortTime');
+            document.getElementById('txt-motto').innerText = t('motto');
+            document.getElementById('txt-timeline').innerText = t('timeline');
+            document.getElementById('txt-noActivity').innerText = t('noActivity');
+            
+            // Lang button UI
+            document.querySelectorAll('[id^="lang-"]').forEach(btn => btn.classList.remove('lang-active'));
+            document.getElementById(`lang-${currentLang}`).classList.add('lang-active');
+        }
+
         function renderMemories() {
+            updateStaticTexts();
+
             // Update Tab UI
             document.querySelectorAll('.user-tab').forEach(btn => btn.classList.remove('user-tab-active'));
             document.getElementById(`btn-${currentUser}`).classList.add('user-tab-active');
-            document.getElementById('active-user-label').innerText = `${currentUser} View`;
+            document.getElementById('active-user-label').innerText = t(`${currentUser}View`);
 
             container.innerHTML = '';
             
@@ -179,7 +319,7 @@
             emptyState.classList.add('hidden');
             container.classList.remove('hidden');
 
-            const currentMonthName = new Date().toLocaleString('default', { month: 'long', year: 'numeric' });
+            const currentMonthName = new Date().toLocaleString(currentLang, { month: 'long', year: 'numeric' });
 
             // Grouping Logic
             const monthlyData = {};
@@ -187,7 +327,7 @@
 
             filteredMemory.forEach(item => {
                 const dateObj = new Date(item.date);
-                const monthName = dateObj.toLocaleString('default', { month: 'long', year: 'numeric' });
+                const monthName = dateObj.toLocaleString(currentLang, { month: 'long', year: 'numeric' });
                 const dateKey = item.date;
 
                 const [hrs, mins] = (item.time || "00:00").split(':').map(Number);
@@ -199,7 +339,12 @@
                 monthlyData[monthName][dateKey].push(item);
             });
 
-            const sortedMonths = Object.keys(monthlyData).sort((a, b) => new Date(b) - new Date(a));
+            const sortedMonths = Object.keys(monthlyData).sort((a, b) => {
+                // We need date comparison, not string name comparison
+                const firstA = Object.keys(monthlyData[a])[0];
+                const firstB = Object.keys(monthlyData[b])[0];
+                return new Date(firstB) - new Date(firstA);
+            });
 
             sortedMonths.forEach((month, mIdx) => {
                 const monthId = `month-${mIdx}`;
@@ -229,10 +374,11 @@
 
                 const summaryParts = Object.keys(activitySummary).map(type => {
                     const data = activitySummary[type];
+                    const translatedType = getTranslatedType(type);
                     if (data.km > 0) {
-                        return `<span class="whitespace-nowrap">${type} <span class="text-slate-800 font-black">${data.km.toFixed(1)}KM</span></span>`;
+                        return `<span class="whitespace-nowrap">${translatedType} <span class="text-slate-800 font-black">${data.km.toFixed(1)}KM</span></span>`;
                     } else {
-                        return `<span class="whitespace-nowrap">${type} <span class="text-slate-800 font-black">${formatDuration(data.min)}</span></span>`;
+                        return `<span class="whitespace-nowrap">${translatedType} <span class="text-slate-800 font-black">${formatDuration(data.min)}</span></span>`;
                     }
                 });
 
@@ -249,7 +395,7 @@
                             <div class="flex flex-col sm:flex-row sm:items-center justify-between w-full mb-2">
                                 <h3 class="text-xl font-black text-slate-800 uppercase tracking-tighter">${month}</h3>
                                 <div class="flex items-center gap-3 mt-2 sm:mt-0">
-                                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">${monthSessions} sessions</span>
+                                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">${monthSessions} ${t('sessions')}</span>
                                     <span class="w-1.5 h-1.5 bg-slate-200 rounded-full"></span>
                                     <span class="text-sm font-black text-indigo-600 uppercase tracking-tighter">${formatTotalTime(monthMinutes)}</span>
                                 </div>
@@ -291,7 +437,7 @@
                             : '';
 
                         const userBadge = currentUser === 'Family' 
-                            ? `<span class="ml-2 text-[9px] font-black ${item.user === 'Me' ? 'text-blue-500 bg-blue-50' : 'text-rose-500 bg-rose-50'} px-2 py-0.5 rounded-full uppercase tracking-widest border border-current opacity-70">${item.user}</span>` 
+                            ? `<span class="ml-2 text-[9px] font-black ${item.user === 'Me' ? 'text-blue-500 bg-blue-50' : 'text-rose-500 bg-rose-50'} px-2 py-0.5 rounded-full uppercase tracking-widest border border-current opacity-70">${t(item.user)}</span>` 
                             : '';
 
                         row.innerHTML = `
@@ -301,7 +447,7 @@
                                 </div>
                                 <div class="flex flex-col">
                                     <div class="flex items-center">
-                                        <span class="text-sm font-extrabold text-slate-700">${item.type}</span>
+                                        <span class="text-sm font-extrabold text-slate-700">${getTranslatedType(item.type)}</span>
                                         ${distanceTag}
                                         ${userBadge}
                                     </div>
@@ -309,7 +455,7 @@
                             </div>
                             <div class="text-right">
                                 <span class="text-lg font-black font-mono text-slate-800 tracking-tighter">${item.time}</span>
-                                <p class="text-[8px] font-black text-slate-300 uppercase tracking-widest">Duration</p>
+                                <p class="text-[8px] font-black text-slate-300 uppercase tracking-widest">${t('duration')}</p>
                             </div>
                         `;
                         dayGroup.appendChild(row);
@@ -329,7 +475,7 @@
 
             document.getElementById('stat-count').innerText = filteredMemory.length;
             document.getElementById('stat-time').innerText = formatTotalTime(globalTotalMinutes);
-            document.getElementById('entry-count-label').innerText = `${filteredMemory.length} Sessions`;
+            document.getElementById('entry-count-label').innerText = `${filteredMemory.length} ${t('sessions')}`;
             
             lucide.createIcons();
         }
@@ -350,7 +496,7 @@
             if (!dateStr || dateStr === 'Unknown Date') return dateStr;
             const options = { month: 'short', day: 'numeric' };
             try {
-                return new Date(dateStr).toLocaleDateString(undefined, options);
+                return new Date(dateStr).toLocaleDateString(currentLang, options);
             } catch(e) {
                 return dateStr;
             }
