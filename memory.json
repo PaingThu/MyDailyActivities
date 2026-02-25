@@ -11,5 +11,7 @@
     { "user": "Me", "type": "Coding", "time": "01:00", "date": "2026-01-15" },
     { "user": "Wife", "type": "Running", "time": "00:30", "date": "2026-01-12", "distance": "4.0" },
     { "user": "Me", "type": "Strength", "time": "00:45", "date": "2026-01-10" },
+    { "user": "Me", "type": "Strength", "time": "00:45", "date": "2026-01-09" },
+    { "user": "Me", "type": "Strength", "time": "00:45", "date": "2026-01-08" },
     { "user": "Me", "type": "Strength", "time": "00:45", "date": "2026-01-09" }
 ]
