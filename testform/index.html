@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sheet Database App</title>
+    <style>
+        body { font-family: sans-serif; max-width: 500px; margin: 40px auto; padding: 20px; }
+        form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 30px; }
+        input, button { padding: 10px; }
+        .data-item { border-bottom: 1px solid #ccc; padding: 10px 0; }
+    </style>
+</head>
+<body>
+
+    <h2>Submit Data</h2>
+    <form id="userForm">
+        <input type="text" id="name" placeholder="Name" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="text" id="message" placeholder="Message" required>
+        <button type="submit">Save to Spreadsheet</button>
+    </form>
+
+    <h2>Stored Data</h2>
+    <button onclick="loadData()">Refresh Data</button>
+    <div id="displayArea"></div>
+
+    <script>
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycby3Tu7WQ5_kO2xkdYa8tKn7b6y7W4hm7jIIf2gARKAPM5MfZrHl2YN6bsnPjNOvvp0d/exec';
+
+        // POST Data
+        document.getElementById('userForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const data = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                message: document.getElementById('message').value
+            };
+
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                mode: 'no-cors', // Apps Script requires this for simple POSTs
+                cache: 'no-cache',
+                body: JSON.stringify(data)
+            }).then(() => {
+                alert('Data sent!');
+                document.getElementById('userForm').reset();
+            });
+        });
+
+        // GET Data
+        function loadData() {
+            fetch(WEB_APP_URL)
+                .then(res => res.json())
+                .then(data => {
+                    const container = document.getElementById('displayArea');
+                    container.innerHTML = '';
+                    data.forEach(row => {
+                        const div = document.createElement('div');
+                        div.className = 'data-item';
+                        div.innerHTML = `<strong>${row[1]}</strong> (${row[2]}): ${row[3]}`;
+                        container.appendChild(div);
+                    });
+                });
+        }
+    </script>
+</body>
+</html>
