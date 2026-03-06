@@ -113,6 +113,16 @@
 
                 <div id="memory-container" class="space-y-8">
                     <!-- Month Groups injected here -->
+                    <!-- Loading... -->
+                    <div id="displayArea" class="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                        <div class="text-center py-10 text-slate-400">
+                            <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <svg class="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                            </div>
+                            <p>No data loaded yet.</p>
+                            <p class="text-xs">Entries will appear here in the order they were saved.</p>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Empty State -->
@@ -186,20 +196,7 @@
          * In a live environment with a web server, you can fetch this from memory.json.
          * For the current preview environment, we keep it here to ensure it loads correctly.
          */
-        let memory = [
-            { "user": "Me", "type": "Coding", "time": "02:30", "date": "2026-02-25" },
-            { "user": "Wife", "type": "Meditation", "time": "00:20", "date": "2026-02-25" },
-            { "user": "Me", "type": "Walking", "time": "00:45", "date": "2026-02-25", "distance": "4.2" },
-            { "user": "Wife", "type": "Running", "time": "00:40", "date": "2026-02-24", "distance": "6.2" },
-            { "user": "Me", "type": "Learning", "time": "00:30", "date": "2026-02-24" },
-            { "user": "Wife", "type": "Strength", "time": "01:00", "date": "2026-02-23" },
-            { "user": "Me", "type": "Strength", "time": "01:15", "date": "2026-02-23" },
-            { "user": "Me", "type": "Cardio", "time": "00:45", "date": "2026-02-22" },
-            { "user": "Wife", "type": "Meditation", "time": "00:15", "date": "2026-02-22" },
-            { "user": "Me", "type": "Coding", "time": "01:00", "date": "2026-01-15" },
-            { "user": "Wife", "type": "Running", "time": "00:30", "date": "2026-01-12", "distance": "4.0" },
-            { "user": "Me", "type": "Strength", "time": "00:45", "date": "2026-01-10" }
-        ];
+        let memory = [];
         // Sample Data
         // [
         //     { "user": "Me", "type": "Coding", "time": "02:30", "date": "2026-02-25" },
@@ -235,14 +232,53 @@
          * Standard browsers block fetch requests to local file:// paths for security.
          */
         async function loadData() {
+            const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzgsuA7_mjRWvpcuagCPKYlE91vxq0V2M4XGXT9udM3yLZ2mvr8TBL0eFYv7VvoVnpK/exec';
+            displayArea.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-12 space-y-3">
+                    <div class="w-10 h-10 border-4 border-slate-100 border-t-blue-500 rounded-full animate-spin"></div>
+                    <span class="text-xs font-medium text-slate-400">Syncing with Sheets...</span>
+                </div>`;
             try {
-                const response = await fetch('/memory.json');
-                if (!response.ok) throw new Error('Could not fetch memory.json');
-                memory = await response.json();
+                const response = await fetch(WEB_APP_URL);
+                const data = await response.json();
+                console.log('Fetched data from Google Sheets:', data);
+
+                const validRows = data.filter(row => row && row.length >= 5 && row[1] !== 'User');
+
+                if (validRows.length === 0) {
+                    displayArea.innerHTML = `<p class="text-slate-400 text-center py-10 text-sm">The history is currently empty.</p>`;
+                    return;
+                }
+
+                memory = validRows.map(entry => {
+                    return {
+                        "user": entry[0],
+                        "type": entry[1],
+                        "date": entry[2],
+                        "time": entry[3],
+                        "distance": entry[4]
+                    };
+                }).sort((a, b) => {
+                    return a.date.localeCompare(b.date);
+                });
+
+                console.log('Formatted data ready for rendering:', memory);
                 renderMemories();
+
             } catch (error) {
-                console.error('Error loading external JSON:', error);
+                console.error('Fetch error:', error);
+                displayArea.innerHTML = `<p class="text-red-500 text-center py-10 text-sm">Error connecting to database.</p>`;
             }
+
+            // try {
+            //     const response = await fetch('/memory.json');
+            //     if (!response.ok) throw new Error('Could not fetch memory.json');
+            //     memory = await response.json();
+            //     console.log('Loaded memory.json:', memory);
+            //     renderMemories();
+            // } catch (error) {
+            //     console.error('Error loading external JSON:', error);
+            // }
         }
 
         function changeLang(lang) {
@@ -297,7 +333,7 @@
             document.getElementById('active-user-label').innerText = t(`${currentUser}View`);
 
             container.innerHTML = '';
-            
+            console.log('Rendering memories ', memory);
             const filteredMemory = memory.filter(item => 
                 currentUser === 'Family' || item.user === currentUser
             );
@@ -408,7 +444,7 @@
                                 <div class="p-2.5 rounded-xl ${config.colorClass} shadow-sm group-hover:scale-110 transition-transform"><i data-lucide="${config.icon}" class="w-5 h-5"></i></div>
                                 <div class="flex flex-col"><div class="flex items-center">
                                     <span class="text-sm font-extrabold text-slate-700">${getTranslatedType(item.type)}</span>
-                                    ${item.distance ? `<span class="inline-flex items-center text-[9px] font-black px-2 py-0.5 rounded bg-indigo-50 text-indigo-500 border border-indigo-100 ml-2 uppercase tracking-tighter">${item.distance} km</span>` : ''}
+                                    ${item.distance != '-' ? `<span class="inline-flex items-center text-[9px] font-black px-2 py-0.5 rounded bg-indigo-50 text-indigo-500 border border-indigo-100 ml-2 uppercase tracking-tighter">${item.distance} km</span>` : ''}
                                     ${currentUser === 'Family' ? `<span class="ml-2 text-[9px] font-black ${item.user === 'Me' ? 'text-blue-500 bg-blue-50' : 'text-rose-500 bg-rose-50'} px-2 py-0.5 rounded-full uppercase tracking-widest border border-current opacity-70">${t(item.user)}</span>` : ''}
                                 </div></div>
                             </div>
