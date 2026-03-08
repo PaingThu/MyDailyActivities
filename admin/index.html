@@ -120,7 +120,32 @@
     </div>
 
     <script>
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyt8aQ9HvEd0tSG7s3VW1jfPAMKa3Mjx-HGrLYBQf8D9hcuaGKPcUtZkSDmikD5GYzS/exec';
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzgsuA7_mjRWvpcuagCPKYlE91vxq0V2M4XGXT9udM3yLZ2mvr8TBL0eFYv7VvoVnpK/exec';
+
+        function getCookie(name) {
+            // 1. Get all cookies and split them by the semicolon
+            let cookieArr = document.cookie.split(";");
+
+            // 2. Loop through each cookie pair
+            for (let i = 0; i < cookieArr.length; i++) {
+                let cookiePair = cookieArr[i].split("=");
+
+                // 3. Remove whitespace and check if the name matches
+                if (name === cookiePair[0].trim()) {
+                    // 4. Return the value (the token)
+                    return decodeURIComponent(cookiePair[1]);
+                }
+            }
+            // Return null if the cookie was not found
+            return null;
+        }
+
+        // How to use it:
+        const token = getCookie("userToken");
+
+        if (!token) {
+            window.location.href = "/admin/login/";
+        }
 
         const form = document.getElementById('userForm');
         const submitBtn = document.getElementById('submitBtn');
@@ -303,6 +328,11 @@
                 type === 'success' ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-red-50 text-red-700 border border-red-100'
             }`;
             setTimeout(() => statusMsg.classList.add('hidden'), 5000);
+        }
+
+        function logout() {
+            document.cookie = "userToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            window.location.href = "/admin/login/";
         }
 
         // Initialize App
