@@ -116,6 +116,8 @@
                     <div class="w-10 h-10 border-4 border-slate-100 border-t-blue-500 rounded-full animate-spin"></div>
                     <span class="text-xs font-medium text-slate-400">Authenticating...</span>
                 </div>`;
+            status.textContent = '';
+            status.classList.add('hidden');
 
             const ipaddress = await fetch('https://api.ipify.org?format=json')
                 .then(res => res.json())
