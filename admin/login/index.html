@@ -67,10 +67,10 @@
         const getBasePath = () => {
             const path = window.location.pathname;
             // If on GitHub Pages, the first part of the path is the repo name
-            if (window.location.hostname.includes("github.io")) {
-                return "/" + path.split('/')[1] + "/";
+            if (window.location.hostname.includes("localhost")) {
+                return "/"; // Localhost root
             }
-            return "/"; // Localhost root
+            return "/" + path.split('/')[1] + "/";
         };
         function getCookie(name) {
             // 1. Get all cookies and split them by the semicolon
