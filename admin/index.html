@@ -119,6 +119,7 @@
         </div>
     </div>
 
+    <script type="module" src="../assets/js/admin.js"></script>
     <script>
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzgsuA7_mjRWvpcuagCPKYlE91vxq0V2M4XGXT9udM3yLZ2mvr8TBL0eFYv7VvoVnpK/exec';
 
@@ -153,6 +154,14 @@
 
         if (!token) {
             window.location.href = getBasePath() + "admin/login/";
+        }else{
+            // let payload = {
+            //     action: 'getLoginInfo',
+            //     adminId: document.getElementById('adminId').value,
+            //     password: document.getElementById('password').value,
+            //     status: '0001',
+            //     userIp: ipaddress
+            // };
         }
 
         const form = document.getElementById('userForm');
@@ -249,8 +258,8 @@
                 const response = await fetch(WEB_APP_URL);
                 const data = await response.json();
                 const memory = data.sort((a, b) => {
-                    const dateA = a[2];
-                    const dateB = b[2];
+                    const dateA = a[3];
+                    const dateB = b[3];
                     return dateA.localeCompare(dateB);
                 });
                 renderData(memory);
@@ -277,11 +286,12 @@
             const sortedRows = [...validRows].reverse();
 
             displayArea.innerHTML = sortedRows.map(row => {
-                const userName = row[0];
-                const activityType = row[1];
-                const activityDate = row[2];
-                const activityTime = row[3];
-                const distanceValue = row[4];
+                const id = row[0]; // Assuming the first column is a unique ID or timestamp
+                const userName = row[1];
+                const activityType = row[2];
+                const activityDate = row[3];
+                const activityTime = row[4];
+                const distanceValue = row[5];
                 
                 const isCardio = ['Walking', 'Running'].includes(activityType);
                 const userColorClass = userName === 'Wife' ? 'bg-pink-100 text-pink-700' : 'bg-blue-100 text-blue-700';
@@ -290,8 +300,12 @@
                 <div class="p-4 bg-white border border-slate-100 rounded-xl hover:border-slate-300 hover:shadow-md transition-all group">
                     <div class="flex justify-between items-start mb-2">
                         <span class="px-2 py-0.5 ${userColorClass} text-[10px] font-bold rounded uppercase tracking-wider">${userName}</span>
-                        <div class="text-right">
+                        <div class="flex items-center gap-2">
                              <div class="text-[10px] text-slate-400 font-medium">${activityDate}</div>
+                             <button class='hidden' onclick="startEdit(${id})" 
+                                     class="p-1.5 text-slate-300 hover:text-blue-500 hover:bg-blue-50 transition-all rounded-md" title="Edit entry">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                             </button>
                         </div>
                     </div>
                     <div class="flex items-end justify-between">
@@ -315,6 +329,25 @@
                 </div>
                 `;
             }).join('');
+        }
+
+        function startEdit(id) {
+            console.log('Edit entry with ID:', id);
+            
+            // Populate form
+            document.getElementById('user').value = user;
+            document.getElementById('type').value = type;
+            document.getElementById('date').value = date;
+            document.getElementById('time').value = time;
+            distanceInput.value = distance === '-' ? '' : distance;
+            
+            // UI Feedback
+            formTitle.innerHTML = `<svg class="w-5 h-5 mr-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg> Editing Entry`;
+            btnText.textContent = 'Update Entry';
+            cancelEditBtn.classList.remove('hidden');
+            
+            toggleDistanceVisibility();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function setLoading(isLoading) {
