@@ -16,7 +16,7 @@ export const getBasePath = () => {
     return "/"; // Localhost root
 };
 
-export const getCookie = (name) => {
+const getCookie = (name) => {
     // 1. Get all cookies and split them by the semicolon
     let cookieArr = document.cookie.split(";");
 
@@ -33,4 +33,5 @@ export const getCookie = (name) => {
     // Return null if the cookie was not found
     return null;
 };
+export const token = getCookie("userToken");
 

@@ -1,20 +1,44 @@
-import { WEB_APP_URL, getBasePath, getCookie } from "./config.js";
+import { WEB_APP_URL, getBasePath, token, COMMON } from "./config.js";
 
-console.log('Admin JS Loaded');
+console.log('Admin JS Loaded', { WEB_APP_URL, token, userIp: COMMON.ipaddress });
 
-// How to use it:
-const token = getCookie("userToken");   
+// How to use it: 
+console.log('Retrieved token from cookies:', token);
 
-if (!token) {
-    window.location.href = getBasePath() + "admin/login/";
-}else{
-    // let payload = {
-    //     action: 'getLoginInfo',
-    //     adminId: document.getElementById('adminId').value,
-    //     password: document.getElementById('password').value,
-    //     status: '0001',
-    //     userIp: ipaddress
-    // };
+let payload = {
+    action: 'getLoginInfo',
+    token: token,
+    userIp: COMMON.ipaddress
+};
+try {
+    if(payload.token === null) {
+        throw new Error("No token found. User is not authenticated.");
+    }
+    console.log('Verifying token with server...', payload);
+  const response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error("Server returned status " + response.status);
+                }
+
+                const result = await response.json();
+                console.log("Login response:", result);
+    // if (!response.ok) {
+    //     throw new Error("Server returned status " + response.status);
+    // }
+    // const result = await response.json();
+    // console.log('Server response:', result);
+    // if (result.status !== 'success') {
+    //     throw new Error("Authentication failed: " + result.message);
+    // }
+    // console.log('Authentication successful for user:', result.user);
+} catch (error) {
+    console.error('Error:', error);
+    // document.cookie = "userToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    // window.location.href = getBasePath() + "admin/login/";
 }
 
 const form = document.getElementById('userForm');
