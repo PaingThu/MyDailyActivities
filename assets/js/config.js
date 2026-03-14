@@ -35,3 +35,48 @@ const getCookie = (name) => {
 };
 export const token = getCookie("userToken");
 
+export const deleteCookie = (name) => {
+    document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+}
+
+export async function tokenCheck(pageType = 'login') {
+    if (token) {
+        let payload = {
+            action: 'getLoginInfo',
+            token: token,
+            userIp: COMMON.ipaddress
+        };
+        try {
+            const response = await fetch(WEB_APP_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error("Server returned status " + response.status);
+            }
+
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                if (pageType === 'login') {
+                    window.location.href = getBasePath() + "admin/";
+                }
+            } else {
+                deleteCookie("userToken");
+                throw new Error("Authentication failed: " + result.message);
+            } 
+            
+        } catch (err) {
+            console.error(err);
+            if(pageType === 'admin'){
+                window.location.href = getBasePath() + "admin/login/";
+            } 
+        }
+    }else{
+        if(pageType === 'admin'){
+            window.location.href = getBasePath() + "admin/login/";
+        }
+    }
+}
+
