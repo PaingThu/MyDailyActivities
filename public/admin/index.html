@@ -36,7 +36,7 @@
             <div>
                 <h1 class="text-4xl font-bold tracking-tight text-slate-800">Our Daily Activities</h1>
                 <p class="text-slate-400 text-sm">Welcome, Admin: <span id="adminName"></span>!</p>
-                <p class="mt-1 text-slate-500">Track your daily activities and habits.</p>
+                <p id="userPage" class="mt-1 text-slate-500">Track your daily activities and habits.</p>
             </div>
             <button id="logoutBtn" class="text-sm font-medium text-slate-400 hover:text-red-500 transition">Logout</button>
         </header>
@@ -122,9 +122,14 @@
 
     <script type="module" src="../assets/js/admin.js?v=1.0.1"></script>
     <script type="module">
-        import { tokenCheck } from "../assets/js/config.js?v=1.0.1";
+        import { tokenCheck, getBasePath } from "../assets/js/config.js?v=1.0.1";
         
         tokenCheck('admin');   
+
+        const userPageLink = document.getElementById('userPage');
+        userPageLink.onclick = () => {
+            window.open(getBasePath(), '_blank');
+        };
     </script>
 </body>
 </html>
