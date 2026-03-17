@@ -15,8 +15,8 @@ const admin = document.getElementById('adminName');
 const timeInputContainer = document.getElementById('timeInputContainer');
 
 // Set default date and time to now
-const now = new Date();
-document.getElementById('date').valueAsDate = now;
+const now = new Date().toLocaleDateString(('ja-JP'), { year: 'numeric', month: '2-digit', day: '2-digit' }).split('/').join('-');
+document.getElementById('date').value = now;
 
 const durationOptions = [
     '00:15', '00:30', '00:45', '01:00', '01:15', '01:30', 
