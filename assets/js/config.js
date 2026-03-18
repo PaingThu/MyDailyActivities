@@ -103,5 +103,10 @@ function birthdayWish(name) {
         happyBirthday.textContent = birthdayMessage;
         happyBirthday.classList.remove('hidden');
     }
+     if(name === 'MAW PAING THU' && today === '03-19'){
+        const birthdayMessage = `🎉 Today is MAA MAA's Birthday! 🎂`;
+        happyBirthday.textContent = birthdayMessage;
+        happyBirthday.classList.remove('hidden');
+    }
 }
 
