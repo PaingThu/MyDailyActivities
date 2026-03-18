@@ -13,6 +13,7 @@ const loadDataBtn = document.getElementById('loadDataBtn');
 const logoutBtn = document.getElementById('logoutBtn');
 const admin = document.getElementById('adminName');
 const timeInputContainer = document.getElementById('timeInputContainer');
+const happyBirthday = document.getElementById('happyBirthday');
 
 // Set default date and time to now
 const now = new Date().toLocaleDateString(('ja-JP'), { year: 'numeric', month: '2-digit', day: '2-digit' }).split('/').join('-');
