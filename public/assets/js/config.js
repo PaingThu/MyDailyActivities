@@ -76,6 +76,9 @@ export async function tokenCheck(pageType = 'login') {
                     window.location.href = getBasePath() + "admin/";
                 }
                 adminName.textContent = result.name;
+                if(result.birthdayInfo.today){
+                    birthdayWish(result.birthdayInfo);
+                }
             } else {
                 deleteCookie("userToken");
                 throw new Error("Authentication failed: " + result.message);
@@ -92,5 +95,10 @@ export async function tokenCheck(pageType = 'login') {
             window.location.href = getBasePath() + "admin/login/";
         }
     }
+}
+
+function birthdayWish(birthdayInfo){ 
+    happyBirthday.textContent = birthdayInfo.message;
+    happyBirthday.classList.remove('hidden');
 }
 
