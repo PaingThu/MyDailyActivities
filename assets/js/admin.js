@@ -1,11 +1,14 @@
-import { WEB_APP_URL, getBasePath } from "./config.js";
+import { WEB_APP_URL, getBasePath, tokenCheck } from "./config.js";
 
+const authenticating = document.getElementById('authenticating');
+const mainContainer = document.getElementById('mainContainer');
 const form = document.getElementById('userForm');
 const submitBtn = document.getElementById('submitBtn');
 const btnText = document.getElementById('btnText');
 const btnLoader = document.getElementById('btnLoader');
 const statusMsg = document.getElementById('statusMessage');
 const displayArea = document.getElementById('displayArea');
+const user =document.getElementById('user').value
 const typeSelect = document.getElementById('type');
 const distanceContainer = document.getElementById('distanceContainer');
 const distanceInput = document.getElementById('distance');
@@ -14,6 +17,8 @@ const logoutBtn = document.getElementById('logoutBtn');
 const admin = document.getElementById('adminName');
 const timeInputContainer = document.getElementById('timeInputContainer');
 const happyBirthday = document.getElementById('happyBirthday');
+const userPageLink = document.getElementById('userPage');
+userPageLink.onclick = () => { window.open(getBasePath(), '_blank'); };
 
 // Set default date and time to now
 const now = new Date().toLocaleDateString(('ja-JP'), { year: 'numeric', month: '2-digit', day: '2-digit' }).split('/').join('-');
@@ -51,13 +56,22 @@ async function loadData() {
 
 loadDataBtn.addEventListener("click", loadData);
 
-const init = () => {
-    loadData();
+const init = async () => {
+    const result = await tokenCheck('admin'); 
+    if(result && result.status === 'success'){
+        admin.textContent = result.name;
+        if(result.birthdayInfo.today){
+            birthdayWish(result.birthdayInfo);
+        }
+        authenticating.classList.add('hidden');
+        mainContainer.classList.remove('hidden');
+        loadData();
+    }
 };
+
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);
 } else {
-    // If the DOM is already ready (common in modules), run it now
     init();
 }
 
@@ -99,7 +113,7 @@ form.addEventListener('submit', async function(e) {
     setLoading(true);
 
     const payload = {
-        user: String(document.getElementById('user').value),
+        user: String(user.value),
         type: String(document.getElementById('type').value),
         date: "'" + String(document.getElementById('date').value), // Forced Plain Text
         time: "'" + String(document.getElementById('time').value), // Forced Plain Text
@@ -237,6 +251,11 @@ function showMessage(text, type) {
         type === 'success' ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-red-50 text-red-700 border border-red-100'
     }`;
     setTimeout(() => statusMsg.classList.add('hidden'), 5000);
+}
+
+function birthdayWish(birthdayInfo){ 
+    happyBirthday.textContent = birthdayInfo.message;
+    happyBirthday.classList.remove('hidden');
 }
 
 function logout() {
