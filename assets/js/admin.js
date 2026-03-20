@@ -31,7 +31,7 @@ async function loadData() {
     displayArea.innerHTML = `
         <div class="flex flex-col items-center justify-center py-12 space-y-3">
             <div class="w-10 h-10 border-4 border-slate-100 border-t-blue-500 rounded-full animate-spin"></div>
-            <span class="text-xs font-medium text-slate-400">Syncing with Sheets...</span>
+            <span class="text-xs font-medium text-slate-400">Loading Data...</span>
         </div>`;
 
     try {
