@@ -59,9 +59,7 @@ loadDataBtn.addEventListener("click", loadData);
 const init = async () => {
     const result = await tokenCheck('admin'); 
     if(result && result.status === 'success'){
-        console.log("Token Check Result:", result);
         admin.textContent = result.name;
-        console.log("User Name:", result.user);
         user.value = result.user;
         if(result.birthdayInfo.today){
             birthdayWish(result.birthdayInfo);
