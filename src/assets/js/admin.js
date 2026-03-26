@@ -130,7 +130,9 @@ form.addEventListener('submit', async function(e) {
         });
 
         showMessage('Activity successfully recorded!', 'success');
+        const userValue = user.value; // Store current user value before reset
         form.reset();
+        user.value = userValue; // Restore user value after reset
         
         // Reset defaults
         const resetNow = new Date();
