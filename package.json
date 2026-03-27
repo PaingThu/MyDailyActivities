@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo 'Open your browser at localhost:8080' && docker-compose up",
     "build": "vite build",
+    "build:watch": "vite build --watch",
     "deploy": "gh-pages -d dist"
   },
   "repository": {

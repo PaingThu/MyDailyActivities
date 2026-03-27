@@ -1,9 +1,8 @@
 import { loadingSpinner, WEB_APP_URL } from "./config.js";
-console.log("WEB_APP_URL:", WEB_APP_URL);
 
 const translations = {
     en: {
-        appTitle1: "Couple", appTitle2: "Thrive",
+        appTitle1: "Our", appTitle2: "Daily Activities",
         subtitle: "We Wakeup At 5A.M Every Day And Go To Bed Early!",
         Family: "Family", Me: "Paa Paa", Wife: "Maa Maa",
         totalSessions: "Total Sessions", effortTime: "Effort Time",
@@ -85,11 +84,6 @@ const container = document.getElementById('memory-container');
 const emptyState = document.getElementById('empty-state');
 
 // Initial Load
-// window.onload = () => {
-//     // Note: In your local environment, you would call loadData() here instead.
-//     // renderMemories();
-//     loadData();
-// };
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);
 } else {

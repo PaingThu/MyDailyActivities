@@ -236,11 +236,11 @@ function startEdit(id) {
 function setLoading(isLoading) {
     submitBtn.disabled = isLoading;
     if (isLoading) {
-        btnText.textContent = 'Submitting Data...';
+        btnText.textContent = 'Creating Data...';
         btnLoader.classList.remove('hidden');
         submitBtn.classList.add('opacity-80', 'cursor-not-allowed');
     } else {
-        btnText.textContent = 'Save to Spreadsheet';
+        btnText.textContent = 'Create Activity';
         btnLoader.classList.add('hidden');
         submitBtn.classList.remove('opacity-80', 'cursor-not-allowed');
     }
