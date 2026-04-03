@@ -134,10 +134,7 @@ form.addEventListener('submit', async function(e) {
         form.reset();
         user.value = userValue; // Restore user value after reset
         
-        // // Reset defaults
-        // const resetNow = new Date();
-        // document.getElementById('date').valueAsDate = resetNow;
-        document.getElementById('time').value = resetNow.toTimeString().substring(0, 5);
+        document.getElementById('date').value = now;
         
         toggleDistanceVisibility();
         
