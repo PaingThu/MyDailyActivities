@@ -10,7 +10,7 @@ const translations = {
         subtitle: "We Wakeup At 5A.M Every Day And Go To Bed Early!",
         Family: "Family", Me: "Paa Paa", Wife: "Maa Maa", Son: "Son",
         totalSessions: "Total Sessions", effortTime: "Effort Time",
-        FamilyView: "Family", MeView: "Paa Paa", WifeView: "Maa Maa",
+        FamilyView: "Family", MeView: "Paa Paa", WifeView: "Maa Maa", SonView: "Son",
         motto: "We Wakeup At 5A.M Every Day And Go To Bed Early!",
         timeline: "Timeline", sessions: "sessions",
         noActivity: "No activity found for this filter",
