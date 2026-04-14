@@ -18,7 +18,7 @@ const translations = {
         types: {
             coding: "Coding", meditation: "Meditation", walking: "Walking",
             running: "Running", learning: "Learning", gym: "Gym",
-            cardio: "Cardio", workout: "Workout", reading: "Reading", stretching: "Stretching"
+            cardio: "Cardio", workout: "Workout", reading: "Reading", stretching: "Stretching", cycling: "Cycling"
         }
     },
     my: {
@@ -34,7 +34,7 @@ const translations = {
         types: {
             coding: "ကုဒ်ရေးခြင်း", meditation: "တရားထိုင်ခြင်း", walking: "လမ်းလျှောက်ခြင်း",
             running: "ပြေးခြင်း", learning: "လေ့လာခြင်း", gym: "အလေးမခြင်း",
-            cardio: "နှလုံးကျန်းမာရေးလေ့ကျင့်ခန်း", workout: "လေ့ကျင့်ခန်း", reading: "စာဖတ်ခြင်း", stretching: "ကိုယ်လက်ဆန့်ခြင်း"
+            cardio: "နှလုံးကျန်းမာရေးလေ့ကျင့်ခန်း", workout: "လေ့ကျင့်ခန်း", reading: "စာဖတ်ခြင်း", stretching: "ကိုယ်လက်ဆန့်ခြင်း", cycling: "စက်ဘီးစီးခြင်း"
         }
     },
     ja: {
@@ -50,7 +50,7 @@ const translations = {
         types: {
             coding: "コーディング", meditation: "瞑想", walking: "ウォーキング",
             running: "ランニング", learning: "学習", gym: "筋トレ",
-            cardio: "有酸素運動", workout: "ワークアウト", reading: "読書", stretching: "ストレッチ"
+            cardio: "有酸素運動", workout: "ワークアウト", reading: "読書", stretching: "ストレッチ", cycling: "サイクリング"
         }
     }
 };
@@ -395,6 +395,8 @@ function getActivityConfig(typeStr) {
     if (type.includes('run')) return { icon: 'sport-shoe', colorClass: 'bg-orange-100 text-orange-600' };
     if (type.includes('meditation')) return { icon: 'sparkles', colorClass: 'bg-purple-100 text-purple-600' };
     if (type.includes('coding')) return { icon: 'laptop', colorClass: 'bg-blue-100 text-blue-600' };
+    if (type.includes('stretching')) return { icon: 'person-standing', colorClass: 'bg-green-100 text-green-600' };
+    if (type.includes('cycling')) return { icon: 'bike', colorClass: 'bg-yellow-100 text-yellow-600' };
     return { icon: 'activity', colorClass: 'bg-indigo-100 text-indigo-600' };
 }
 

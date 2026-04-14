@@ -75,7 +75,7 @@ if (document.readyState === "loading") {
 // Handle Distance Visibility
 function toggleDistanceVisibility() {
     const selectedType = typeSelect.value;
-    if (['Walking', 'Running'].includes(selectedType)) {
+    if (['Walking', 'Running', 'Cycling'].includes(selectedType)) {
         distanceContainer.classList.remove('hidden');
         distanceInput.required = true;
         timeInputContainer.innerHTML = `
@@ -173,7 +173,7 @@ function renderData(rows) {
         const activityTime = row[4];
         const distanceValue = row[5];
         
-        const isCardio = ['Walking', 'Running'].includes(activityType);
+        const isCardio = ['Walking', 'Running', 'Cycling'].includes(activityType);
         const userColorClass = userName === 'Wife' || userName === 'Maa Maa' ? 'bg-pink-100 text-pink-700' : 'bg-blue-100 text-blue-700';
 
         return `
