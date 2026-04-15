@@ -22,7 +22,7 @@ const translations = {
         }
     },
     my: {
-        appTitle1: "ဇနီးမောင်နှံ", appTitle2: "တိုးတက်ရေး",
+        appTitle1: "ကျွန်ုပ်တို့ရဲ့", appTitle2: "နေ့စဥ်မှတ်တမ်း",
         subtitle: "မနက် ၅ နာရီတိုင်းထပြီး စောစောအိပ်ကြသည်!",
         Family: "မိသားစု", Me: "ဖေကြီး", Wife: "မေကြီး", Son: "သားသား",
         totalSessions: "စုစုပေါင်းအကြိမ်", effortTime: "စုစုပေါင်းကြာချိန်",
@@ -38,7 +38,7 @@ const translations = {
         }
     },
     ja: {
-        appTitle1: "カップル", appTitle2: "スライヴ",
+        appTitle1: "私達の", appTitle2: "日常活動",
         subtitle: "毎朝5時に起きて、早寝早起きを徹底！",
         Family: "家族", Me: "パパ", Wife: "ママ", Son: "息子",
         totalSessions: "合計セッション", effortTime: "努力時間",
