@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Space Typing Defender</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Inter:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #0B0B2A;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            touch-action: none;
+            /* Prevent zooming on mobile */
+        }
+
+        h1,
+        .game-font {
+            font-family: 'Fredoka One', cursive;
+        }
+
+        /* Starry background */
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            background-image:
+                radial-gradient(2px 2px at 20px 30px, #eee, rgba(0, 0, 0, 0)),
+                radial-gradient(2px 2px at 40px 70px, #fff, rgba(0, 0, 0, 0)),
+                radial-gradient(2px 2px at 50px 160px, #ddd, rgba(0, 0, 0, 0)),
+                radial-gradient(2px 2px at 90px 40px, #fff, rgba(0, 0, 0, 0)),
+                radial-gradient(2px 2px at 130px 80px, #fff, rgba(0, 0, 0, 0)),
+                radial-gradient(2px 2px at 160px 120px, #ddd, rgba(0, 0, 0, 0));
+            background-repeat: repeat;
+            background-size: 200px 200px;
+            animation: starsMove 100s linear infinite;
+        }
+
+        @keyframes starsMove {
+            from {
+                background-position: 0 0;
+            }
+
+            to {
+                background-position: 0 1000px;
+            }
+        }
+
+        /* Falling words styling */
+        .falling-word {
+            position: absolute;
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3), inset 0 0 10px rgba(255, 255, 255, 0.1);
+            transition: top 0.1s linear, background-color 0.2s, border-color 0.2s, transform 0.1s;
+            text-align: center;
+            backdrop-filter: blur(4px);
+            z-index: 10;
+        }
+
+        /* Highlight matching prefix */
+        .match-highlight {
+            color: #39FF14;
+            /* Neon green */
+            text-shadow: 0 0 10px #39FF14;
+        }
+
+        /* Laser beam */
+        .laser {
+            position: absolute;
+            width: 4px;
+            background-color: #00F0FF;
+            box-shadow: 0 0 10px #00F0FF, 0 0 20px #00F0FF;
+            z-index: 5;
+            transform-origin: bottom center;
+            opacity: 0;
+            animation: laserFlash 0.3s ease-out forwards;
+        }
+
+        @keyframes laserFlash {
+            0% {
+                opacity: 1;
+                width: 6px;
+            }
+
+            50% {
+                opacity: 1;
+                width: 4px;
+            }
+
+            100% {
+                opacity: 0;
+                width: 0px;
+            }
+        }
+
+        /* Explosion particles */
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 20;
+        }
+
+        /* Screens */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(11, 11, 42, 0.9);
+            z-index: 50;
+            backdrop-filter: blur(5px);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Shaking effect for losing a life */
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
+        }
+
+        @keyframes shake {
+
+            10%,
+            90% {
+                transform: translate3d(-1px, 0, 0);
+            }
+
+            20%,
+            80% {
+                transform: translate3d(2px, 0, 0);
+            }
+
+            30%,
+            50%,
+            70% {
+                transform: translate3d(-4px, 0, 0);
+            }
+
+            40%,
+            60% {
+                transform: translate3d(4px, 0, 0);
+            }
+        }
+
+        #type-input {
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #4F46E5;
+            color: #00F0FF;
+            text-shadow: 0 0 5px #00F0FF;
+        }
+
+        #type-input:focus {
+            outline: none;
+            border-color: #00F0FF;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
+        }
+    </style>
+</head>
+
+<body class="flex flex-col h-screen w-screen overflow-hidden text-white" id="game-body">
+
+    <div class="stars"></div>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="screen">
+        <h1 class="text-5xl md:text-7xl mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 game-font text-center px-4"
+            style="-webkit-text-stroke: 1px white;">
+            Space Typing<br>Defender
+        </h1>
+        <p class="text-xl mb-8 text-blue-200 text-center px-4 max-w-md">
+            Protect your planet! Type the words falling from the sky to shoot them down with your laser.
+        </p>
+
+        <div class="flex flex-col md:flex-row gap-4 mt-4">
+            <button id="btn-easy"
+                class="game-font text-xl px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 rounded-full shadow-[0_0_15px_rgba(16,185,129,0.5)] transform hover:scale-105 transition-all cursor-pointer">
+                EASY (Slow 🐢)
+            </button>
+            <button id="btn-medium"
+                class="game-font text-xl px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-400 hover:to-indigo-400 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.5)] transform hover:scale-105 transition-all cursor-pointer">
+                MEDIUM (Normal 🚶)
+            </button>
+            <button id="btn-hard"
+                class="game-font text-xl px-6 py-3 bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-400 hover:to-rose-400 rounded-full shadow-[0_0_15px_rgba(239,68,68,0.5)] transform hover:scale-105 transition-all cursor-pointer">
+                HARD (Fast 🚀)
+            </button>
+        </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="game-over-screen" class="screen hidden">
+        <h1 class="text-6xl md:text-7xl mb-2 text-red-500 game-font text-center" style="text-shadow: 0 0 20px red;">
+            GAME OVER
+        </h1>
+        <p class="text-3xl mb-8 text-white game-font">
+            Score: <span id="final-score" class="text-yellow-400">0</span>
+        </p>
+
+        <div class="flex flex-col md:flex-row gap-4">
+            <button id="restart-btn"
+                class="game-font text-2xl px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 rounded-full shadow-[0_0_20px_rgba(16,185,129,0.5)] transform hover:scale-105 transition-all cursor-pointer">
+                PLAY AGAIN 🔄
+            </button>
+            <button id="menu-btn"
+                class="game-font text-2xl px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-full shadow-[0_0_20px_rgba(168,85,247,0.5)] transform hover:scale-105 transition-all cursor-pointer">
+                MENU 🔙
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Game UI -->
+    <div class="relative w-full h-full flex flex-col pointer-events-none">
+
+        <!-- Header: Score and Lives -->
+        <header class="flex justify-between items-center p-4 md:p-6 z-20">
+            <div
+                class="flex items-center gap-3 bg-black/40 px-4 py-2 rounded-2xl border border-indigo-500/50 backdrop-blur-sm">
+                <span class="text-2xl">⭐</span>
+                <div class="game-font text-xl md:text-3xl tracking-wider text-yellow-400">
+                    SCORE: <span id="score">0</span>
+                </div>
+            </div>
+            <div
+                class="flex items-center gap-2 bg-black/40 px-4 py-2 rounded-2xl border border-red-500/50 backdrop-blur-sm">
+                <span class="text-xl md:text-2xl game-font text-white">LIVES:</span>
+                <div id="lives" class="flex gap-1 text-2xl md:text-3xl text-red-500">
+                    ❤️ ❤️ ❤️
+                </div>
+            </div>
+        </header>
+
+        <!-- Game Canvas (Words fall here) -->
+        <div id="game-container" class="flex-grow relative overflow-hidden">
+            <!-- Words and lasers injected here -->
+        </div>
+
+        <!-- Footer: Typing Input Area -->
+        <footer class="p-4 md:p-8 flex flex-col items-center justify-end z-20 pointer-events-auto">
+            <!-- Base Station / Turret Graphic -->
+            <div id="turret"
+                class="w-32 h-40 md:w-40 md:h-52 flex items-end justify-center mb-[-10px] z-10 transition-transform duration-100 hover:scale-105">
+                <img src="../assets/ptk-BJKZN014.png" alt="Space Defender"
+                    class="w-full h-full object-cover rounded-2xl border-4 border-cyan-400 shadow-[0_0_20px_rgba(0,240,255,0.8)]"
+                    onerror="this.onerror=null; this.src='https://placehold.co/150x200/0B0B2A/00F0FF?text=Defender'">
+            </div>
+
+            <div class="w-full max-w-md relative z-20 mt-4">
+                <input type="text" id="type-input" autocomplete="off" spellcheck="false"
+                    placeholder="Type words here..."
+                    class="w-full text-center text-3xl md:text-4xl py-4 px-6 rounded-2xl shadow-lg game-font transition-all">
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Setup Audio Context for procedural sound effects
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+
+        // Background Music State
+        let bgmOscillators = [];
+        let bgmGainNode = null;
+
+        // Kid-friendly word dictionary categorized by length
+        const wordDictionary = [
+            // Short (3-4 letters)
+            "cat", "dog", "sun", "sky", "car", "bus", "red", "blue", "fly", "jump",
+            "run", "star", "moon", "tree", "bird", "fish", "play", "fun", "toy", "game",
+            "hat", "bat", "ball", "bear", "lion", "tiger", "frog", "duck", "cow", "pig",
+            // Medium (5-6 letters)
+            "apple", "grape", "melon", "water", "earth", "space", "alien", "robot", "laser",
+            "rocket", "planet", "comet", "happy", "smile", "laugh", "dance", "friend", "school",
+            "house", "mouse", "train", "plane", "candy", "cookie", "orange", "yellow", "purple",
+            // Long (7+ letters)
+            "elephant", "dinosaur", "astronaut", "spaceship", "universe", "beautiful",
+            "butterfly", "chocolate", "icecream", "sunshine", "adventure", "treasure"
+        ];
+
+        // Game Elements
+        const startScreen = document.getElementById('start-screen');
+        const gameOverScreen = document.getElementById('game-over-screen');
+        const gameContainer = document.getElementById('game-container');
+        const btnEasy = document.getElementById('btn-easy');
+        const btnMedium = document.getElementById('btn-medium');
+        const btnHard = document.getElementById('btn-hard');
+        const restartBtn = document.getElementById('restart-btn');
+        const menuBtn = document.getElementById('menu-btn');
+        const typeInput = document.getElementById('type-input');
+        const scoreElement = document.getElementById('score');
+        const livesElement = document.getElementById('lives');
+        const finalScoreElement = document.getElementById('final-score');
+        const turret = document.getElementById('turret');
+        const gameBody = document.getElementById('game-body');
+
+        // Game State
+        let score = 0;
+        let lives = 3;
+        let isPlaying = false;
+        let activeWords = []; // Array of { id, text, element, x, y, speed }
+        let wordIdCounter = 0;
+        let gameLoopRef;
+        let spawnIntervalRef;
+
+        // Difficulty Levels configuration
+        const difficultyLevels = {
+            easy: { baseSpeed: 0.35, spawnRate: 4000 },
+            medium: { baseSpeed: 1.0, spawnRate: 2500 },
+            hard: { baseSpeed: 1.8, spawnRate: 1500 }
+        };
+        let currentDifficulty = 'medium';
+
+        let baseSpeed = 1.0;
+        let spawnRate = 2500; // ms between spawns
+        let lastTime = 0;
+
+        // Colors for words
+        const wordColors = [
+            { bg: 'rgba(239, 68, 68, 0.2)', border: 'rgba(239, 68, 68, 0.5)' },    // Red
+            { bg: 'rgba(59, 130, 246, 0.2)', border: 'rgba(59, 130, 246, 0.5)' },  // Blue
+            { bg: 'rgba(16, 185, 129, 0.2)', border: 'rgba(16, 185, 129, 0.5)' },  // Green
+            { bg: 'rgba(245, 158, 11, 0.2)', border: 'rgba(245, 158, 11, 0.5)' },  // Yellow
+            { bg: 'rgba(168, 85, 247, 0.2)', border: 'rgba(168, 85, 247, 0.5)' }   // Purple
+        ];
+
+
+        // Random helper functions
+        const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+        const randomItem = (arr) => arr[randomInt(0, arr.length - 1)];
+
+        // Select a word based on current score (harder words as score increases)
+        function getNextWord() {
+            let filteredList;
+            if (score < 100) {
+                filteredList = wordDictionary.filter(w => w.length <= 4);
+            } else if (score < 300) {
+                filteredList = wordDictionary.filter(w => w.length <= 6);
+            } else {
+                filteredList = wordDictionary;
+            }
+            return randomItem(filteredList);
+        }
+
+        // --- AUDIO FUNCTIONS ---
+
+        function initAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        // Procedural Space Background Music
+        function startBGM() {
+            initAudioContext();
+            stopBGM(); // clear any existing BGM
+
+            bgmGainNode = audioCtx.createGain();
+
+            // Fade in BGM gently
+            bgmGainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+            bgmGainNode.gain.linearRampToValueAtTime(0.12, audioCtx.currentTime + 2); // Keep volume low
+
+            // Add a lowpass filter to make it sound like deep space rumble
+            const bgmFilter = audioCtx.createBiquadFilter();
+            bgmFilter.type = 'lowpass';
+            bgmFilter.frequency.value = 400;
+
+            bgmGainNode.connect(bgmFilter);
+            bgmFilter.connect(audioCtx.destination);
+
+            // Create a rich, dark atmospheric chord
+            const freqs = [65.41, 98.00, 130.81]; // C2, G2, C3
+            freqs.forEach(freq => {
+                const osc = audioCtx.createOscillator();
+                osc.type = 'triangle'; // Smooth but rich waveform
+                osc.frequency.value = freq;
+
+                // Add a very subtle slow detune wobble (LFO effect)
+                const lfo = audioCtx.createOscillator();
+                lfo.type = 'sine';
+                lfo.frequency.value = 0.2 + (Math.random() * 0.1); // very slow
+                const lfoGain = audioCtx.createGain();
+                lfoGain.gain.value = 2; // Hz wobble
+                lfo.connect(lfoGain);
+                lfoGain.connect(osc.frequency);
+                lfo.start();
+
+                osc.connect(bgmGainNode);
+                osc.start();
+
+                bgmOscillators.push(osc);
+                bgmOscillators.push(lfo); // store LFO to stop it later too
+            });
+        }
+
+        function stopBGM() {
+            if (bgmGainNode) {
+                // Fade out smoothly
+                bgmGainNode.gain.cancelScheduledValues(audioCtx.currentTime);
+                bgmGainNode.gain.setValueAtTime(bgmGainNode.gain.value, audioCtx.currentTime);
+                bgmGainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1);
+            }
+
+            const oldOscillators = bgmOscillators;
+            const oldGain = bgmGainNode;
+
+            bgmOscillators = [];
+            bgmGainNode = null;
+
+            setTimeout(() => {
+                oldOscillators.forEach(osc => {
+                    try { osc.stop(); } catch (e) { }
+                    osc.disconnect();
+                });
+                if (oldGain) oldGain.disconnect();
+            }, 1000);
+        }
+
+        // Generate retro laser pew sound
+        function playLaserSound() {
+            initAudioContext();
+
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.type = 'square';
+
+            // Sweep frequency down quickly to sound like a laser "pew"
+            oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 0.1);
+
+            // Fade out the sound quickly
+            gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.1);
+        }
+
+
+        // --- GAME LOGIC ---
+
+        function spawnWord() {
+            if (!isPlaying) return;
+
+            const text = getNextWord();
+            const id = `word-${wordIdCounter++}`;
+            const el = document.createElement('div');
+
+            // Styling the word element
+            el.id = id;
+            el.className = 'falling-word game-font';
+            el.innerHTML = text; // Setup for inner HTML matching highlighting later
+
+            // Random styling
+            const colorTheme = randomItem(wordColors);
+            el.style.backgroundColor = colorTheme.bg;
+            el.style.borderColor = colorTheme.border;
+
+            // Positioning logic to prevent spawning completely off-screen
+            gameContainer.appendChild(el);
+
+            // Calculate max width after appending to know its true size
+            const rect = el.getBoundingClientRect();
+            const minX = 20;
+            const maxX = gameContainer.clientWidth - rect.width - 20;
+            const startX = randomInt(minX, maxX);
+
+            el.style.left = `${startX}px`;
+            el.style.top = `-50px`; // Start above screen
+
+            // Calculate speed (slightly randomized, increasing with score)
+            let speedMultiplier = 1 + (score / 500); // Default scaling
+            if (currentDifficulty === 'easy') {
+                speedMultiplier = 1 + (score / 1500); // Scale much slower on easy
+            } else if (currentDifficulty === 'hard') {
+                speedMultiplier = 1 + (score / 300); // Scale faster on hard
+            }
+
+            // Apply speed setting
+            const individualSpeed = (baseSpeed * speedMultiplier) + (Math.random() * 0.4 * baseSpeed);
+
+            activeWords.push({
+                id: id,
+                text: text,
+                element: el,
+                x: startX,
+                y: -50,
+                speed: individualSpeed
+            });
+
+            // Gradually decrease spawn rate (make it faster)
+            let minSpawnRate = 800;
+            if (currentDifficulty === 'easy') minSpawnRate = 1800; // Don't let it get too chaotic on easy
+            if (currentDifficulty === 'hard') minSpawnRate = 400;  // Very fast on hard
+
+            if (spawnRate > minSpawnRate) {
+                spawnRate -= 20;
+                clearInterval(spawnIntervalRef);
+                spawnIntervalRef = setInterval(spawnWord, spawnRate);
+            }
+        }
+
+        function gameLoop(timestamp) {
+            if (!isPlaying) return;
+
+            // Calculate delta time for smooth movement regardless of framerate
+            if (!lastTime) lastTime = timestamp;
+            const deltaTime = timestamp - lastTime;
+            lastTime = timestamp;
+
+            const speedAdjust = deltaTime / 16.66; // Normalize to ~60fps
+
+            // Iterate backwards so we can safely remove items
+            for (let i = activeWords.length - 1; i >= 0; i--) {
+                const wordObj = activeWords[i];
+
+                // Move down
+                wordObj.y += wordObj.speed * speedAdjust;
+                wordObj.element.style.transform = `translateY(${wordObj.y}px)`;
+
+                // Check collision with bottom of container
+                const containerHeight = gameContainer.clientHeight;
+
+                if (wordObj.y > containerHeight) {
+                    // Missed the word!
+                    loseLife();
+                    removeWord(i);
+                }
+            }
+
+            if (isPlaying) {
+                gameLoopRef = requestAnimationFrame(gameLoop);
+            }
+        }
+
+
+        // Keep focus on input field always (kid-friendly, no clicking needed)
+        document.addEventListener('click', () => {
+            if (isPlaying) typeInput.focus();
+        });
+
+        typeInput.addEventListener('input', (e) => {
+            if (!isPlaying) return;
+
+            const currentInput = e.target.value.toLowerCase().trim();
+
+            // Check for perfect match first
+            let matchFound = false;
+
+            for (let i = 0; i < activeWords.length; i++) {
+                if (activeWords[i].text === currentInput) {
+                    // Match found!
+                    shootWord(i);
+                    typeInput.value = '';
+                    matchFound = true;
+                    break; // Only destroy one at a time
+                }
+            }
+
+            // Update highlighting for partial matches
+            if (!matchFound) {
+                updateHighlighting(currentInput);
+            } else {
+                updateHighlighting(''); // Clear highlights if matched
+            }
+        });
+
+        // Highlight letters as the kid types
+        function updateHighlighting(inputString) {
+            activeWords.forEach(wordObj => {
+                if (inputString.length > 0 && wordObj.text.startsWith(inputString)) {
+                    // Has matching prefix
+                    const matchedPart = wordObj.text.substring(0, inputString.length);
+                    const restPart = wordObj.text.substring(inputString.length);
+                    wordObj.element.innerHTML = `<span class="match-highlight">${matchedPart}</span>${restPart}`;
+                    wordObj.element.style.transform = `translateY(${wordObj.y}px) scale(1.1)`; // Pop slightly
+                    wordObj.element.style.borderColor = '#39FF14'; // Neon green border
+                } else {
+                    // No match
+                    wordObj.element.innerHTML = wordObj.text;
+                    wordObj.element.style.transform = `translateY(${wordObj.y}px) scale(1.0)`;
+                    // Reset border color to original inline style or fallback
+                    wordObj.element.style.borderColor = '';
+                }
+            });
+        }
+
+
+        function shootWord(index) {
+            const wordObj = activeWords[index];
+            const targetRect = wordObj.element.getBoundingClientRect();
+            const turretRect = turret.getBoundingClientRect();
+
+            // Play the laser sound effect
+            playLaserSound();
+
+            // Calculate center points
+            const targetX = targetRect.left + (targetRect.width / 2);
+            const targetY = targetRect.top + (targetRect.height / 2);
+            const startX = turretRect.left + (turretRect.width / 2);
+            const startY = turretRect.top;
+
+            // Draw laser
+            createLaser(startX, startY, targetX, targetY);
+
+            // Create explosion
+            createExplosion(targetX, targetY, wordObj.text);
+
+            // Update score
+            score += wordObj.text.length * 10;
+            scoreElement.innerText = score;
+
+            // Visual pop on score
+            scoreElement.style.transform = 'scale(1.5)';
+            scoreElement.style.color = '#39FF14';
+            setTimeout(() => {
+                scoreElement.style.transform = 'scale(1)';
+                scoreElement.style.color = '#FBBF24'; // back to yellow
+            }, 200);
+
+            // Remove word
+            removeWord(index);
+        }
+
+        function createLaser(startX, startY, targetX, targetY) {
+            const laser = document.createElement('div');
+            laser.className = 'laser';
+
+            // Calculate distance and angle
+            const dx = targetX - startX;
+            const dy = targetY - startY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const angle = Math.atan2(dy, dx) * (180 / Math.PI) + 90; // +90 because div expands upwards/downwards typically, but we use transform-origin bottom
+
+            // Set positions
+            laser.style.height = `${distance}px`;
+            laser.style.left = `${startX}px`;
+            laser.style.top = `${startY - distance}px`;
+
+            // Rotate to point at target
+            laser.style.transform = `rotate(${angle}deg)`;
+
+            document.body.appendChild(laser);
+
+            // Remove after animation
+            setTimeout(() => {
+                laser.remove();
+            }, 300);
+        }
+
+        function createExplosion(x, y, text) {
+            // Number of particles based on word length
+            const count = text.length * 3;
+            const colors = ['#39FF14', '#00F0FF', '#FBBF24', '#F87171'];
+
+            for (let i = 0; i < count; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+
+                // Random properties
+                const size = randomInt(4, 10);
+                const color = randomItem(colors);
+
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.backgroundColor = color;
+                particle.style.boxShadow = `0 0 ${size}px ${color}`;
+
+                // Start position
+                particle.style.left = `${x}px`;
+                particle.style.top = `${y}px`;
+
+                document.body.appendChild(particle);
+
+                // Animate outwards
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = randomInt(20, 100);
+                const destX = x + Math.cos(angle) * velocity;
+                const destY = y + Math.sin(angle) * velocity;
+
+                // Use Web Animations API for smooth particle explosion
+                particle.animate([
+                    { transform: `translate(0, 0) scale(1)`, opacity: 1 },
+                    { transform: `translate(${destX - x}px, ${destY - y}px) scale(0)`, opacity: 0 }
+                ], {
+                    duration: randomInt(400, 800),
+                    easing: 'cubic-bezier(0, .9, .57, 1)'
+                }).onfinish = () => particle.remove();
+            }
+        }
+
+
+        function removeWord(index) {
+            const wordObj = activeWords[index];
+            wordObj.element.remove();
+            activeWords.splice(index, 1);
+        }
+
+        function loseLife() {
+            lives--;
+            updateLivesDisplay();
+
+            // Screen shake effect
+            gameBody.classList.remove('shake');
+            void gameBody.offsetWidth; // trigger reflow
+            gameBody.classList.add('shake');
+            setTimeout(() => gameBody.classList.remove('shake'), 500);
+
+            // Flash red background
+            const originalBg = gameBody.style.backgroundColor;
+            gameBody.style.backgroundColor = '#450a0a';
+            setTimeout(() => {
+                gameBody.style.backgroundColor = originalBg;
+            }, 200);
+
+            if (lives <= 0) {
+                gameOver();
+            }
+        }
+
+        function updateLivesDisplay() {
+            let hearts = '';
+            for (let i = 0; i < 3; i++) {
+                if (i < lives) hearts += '❤️ ';
+                else hearts += '🖤 ';
+            }
+            livesElement.innerText = hearts;
+        }
+
+        function startGame(difficultyMode) {
+            // Apply difficulty settings if provided, otherwise use previously selected
+            if (difficultyMode) {
+                currentDifficulty = difficultyMode;
+            }
+            const settings = difficultyLevels[currentDifficulty];
+
+            // Reset state
+            score = 0;
+            lives = 3;
+            baseSpeed = settings.baseSpeed;
+            spawnRate = settings.spawnRate;
+
+            activeWords.forEach(w => w.element.remove());
+            activeWords = [];
+            wordIdCounter = 0;
+            lastTime = 0;
+
+            // Update UI
+            scoreElement.innerText = score;
+            updateLivesDisplay();
+            typeInput.value = '';
+
+            startScreen.classList.add('hidden');
+            gameOverScreen.classList.add('hidden');
+
+            isPlaying = true;
+            typeInput.focus();
+
+            // Start Audio
+            startBGM();
+
+            // Start loops
+            spawnIntervalRef = setInterval(spawnWord, spawnRate);
+            gameLoopRef = requestAnimationFrame(gameLoop);
+        }
+
+        function gameOver() {
+            isPlaying = false;
+            clearInterval(spawnIntervalRef);
+            cancelAnimationFrame(gameLoopRef);
+
+            // Stop Audio
+            stopBGM();
+
+            finalScoreElement.innerText = score;
+            gameOverScreen.classList.remove('hidden');
+            typeInput.blur();
+        }
+
+        // Event Listeners for buttons
+        btnEasy.addEventListener('click', () => startGame('easy'));
+        btnMedium.addEventListener('click', () => startGame('medium'));
+        btnHard.addEventListener('click', () => startGame('hard'));
+
+        restartBtn.addEventListener('click', () => startGame());
+        menuBtn.addEventListener('click', () => {
+            gameOverScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+        });
+
+        // Prevent form submission behavior on enter key if it were in a form
+        typeInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+            }
+        });
+
+    </script>
+</body>
+
+</html>
