@@ -69,6 +69,31 @@
             text-align: center;
             backdrop-filter: blur(4px);
             z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Alien Clipart Animation */
+        .alien-clipart {
+            font-size: 3rem;
+            line-height: 1;
+            margin-bottom: 0.25rem;
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
+            animation: wiggle 2s ease-in-out infinite;
+        }
+
+        @keyframes wiggle {
+
+            0%,
+            100% {
+                transform: rotate(-10deg) scale(1);
+            }
+
+            50% {
+                transform: rotate(10deg) scale(1.1);
+            }
         }
 
         /* Highlight matching prefix */
@@ -280,17 +305,25 @@
         let audioCtx;
 
         // Background Music State
-        let bgmOscillators = [];
         let bgmGainNode = null;
+        let bgmTimerID = null;
+        let nextNoteTime = 0;
+        let currentNoteIndex = 0;
+        const bgmSequence = [
+            261.63, 329.63, 392.00, 523.25, // C4, E4, G4, C5
+            261.63, 329.63, 392.00, 523.25,
+            349.23, 440.00, 523.25, 698.46, // F4, A4, C5, F5
+            392.00, 493.88, 587.33, 783.99, // G4, B4, D5, G5
+        ];
 
         // Kid-friendly word dictionary categorized by length
         // const wordDictionary = [
         //     // Short (3-4 letters)
-        //     "cat", "dog", "sun", "sky", "car", "bus", "red", "blue", "fly", "jump",
+        //     "cat", "dog", "sun", "sky", "car", "bus", "red", "blue", "fly", "jump", 
         //     "run", "star", "moon", "tree", "bird", "fish", "play", "fun", "toy", "game",
         //     "hat", "bat", "ball", "bear", "lion", "tiger", "frog", "duck", "cow", "pig",
         //     // Medium (5-6 letters)
-        //     "apple", "grape", "melon", "water", "earth", "space", "alien", "robot", "laser",
+        //     "apple", "grape", "melon", "water", "earth", "space", "alien", "robot", "laser", 
         //     "rocket", "planet", "comet", "happy", "smile", "laugh", "dance", "friend", "school",
         //     "house", "mouse", "train", "plane", "candy", "cookie", "orange", "yellow", "purple",
         //     // Long (7+ letters)
@@ -379,71 +412,68 @@
             }
         }
 
-        // Procedural Space Background Music
+        // Procedural Upbeat Background Music (Retro 8-bit style)
+        function scheduleBGM() {
+            if (!bgmGainNode) return;
+            // Schedule notes a little bit ahead of current time to ensure smooth playback
+            while (nextNoteTime < audioCtx.currentTime + 0.1) {
+                playBGMNote(bgmSequence[currentNoteIndex], nextNoteTime);
+                nextNoteTime += 0.2; // 0.2 seconds per note (tempo)
+                currentNoteIndex = (currentNoteIndex + 1) % bgmSequence.length;
+            }
+            bgmTimerID = requestAnimationFrame(scheduleBGM);
+        }
+
+        function playBGMNote(frequency, time) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc.type = 'square'; // retro 8-bit style sound
+            osc.frequency.setValueAtTime(frequency, time);
+
+            // Pluck envelope for bouncy sound
+            gain.gain.setValueAtTime(0, time);
+            gain.gain.linearRampToValueAtTime(0.04, time + 0.02); // Keep volume kid-friendly
+            gain.gain.exponentialRampToValueAtTime(0.001, time + 0.18);
+
+            osc.connect(gain);
+            gain.connect(bgmGainNode);
+
+            osc.start(time);
+            osc.stop(time + 0.2);
+        }
+
         function startBGM() {
             initAudioContext();
             stopBGM(); // clear any existing BGM
 
             bgmGainNode = audioCtx.createGain();
+            bgmGainNode.connect(audioCtx.destination);
 
             // Fade in BGM gently
             bgmGainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-            bgmGainNode.gain.linearRampToValueAtTime(0.12, audioCtx.currentTime + 2); // Keep volume low
+            bgmGainNode.gain.linearRampToValueAtTime(1, audioCtx.currentTime + 1);
 
-            // Add a lowpass filter to make it sound like deep space rumble
-            const bgmFilter = audioCtx.createBiquadFilter();
-            bgmFilter.type = 'lowpass';
-            bgmFilter.frequency.value = 400;
-
-            bgmGainNode.connect(bgmFilter);
-            bgmFilter.connect(audioCtx.destination);
-
-            // Create a rich, dark atmospheric chord
-            const freqs = [65.41, 98.00, 130.81]; // C2, G2, C3
-            freqs.forEach(freq => {
-                const osc = audioCtx.createOscillator();
-                osc.type = 'triangle'; // Smooth but rich waveform
-                osc.frequency.value = freq;
-
-                // Add a very subtle slow detune wobble (LFO effect)
-                const lfo = audioCtx.createOscillator();
-                lfo.type = 'sine';
-                lfo.frequency.value = 0.2 + (Math.random() * 0.1); // very slow
-                const lfoGain = audioCtx.createGain();
-                lfoGain.gain.value = 2; // Hz wobble
-                lfo.connect(lfoGain);
-                lfoGain.connect(osc.frequency);
-                lfo.start();
-
-                osc.connect(bgmGainNode);
-                osc.start();
-
-                bgmOscillators.push(osc);
-                bgmOscillators.push(lfo); // store LFO to stop it later too
-            });
+            nextNoteTime = audioCtx.currentTime + 0.1;
+            currentNoteIndex = 0;
+            scheduleBGM();
         }
 
         function stopBGM() {
+            if (bgmTimerID) {
+                cancelAnimationFrame(bgmTimerID);
+                bgmTimerID = null;
+            }
             if (bgmGainNode) {
                 // Fade out smoothly
                 bgmGainNode.gain.cancelScheduledValues(audioCtx.currentTime);
                 bgmGainNode.gain.setValueAtTime(bgmGainNode.gain.value, audioCtx.currentTime);
                 bgmGainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1);
+
+                const oldGain = bgmGainNode;
+                bgmGainNode = null;
+                setTimeout(() => oldGain.disconnect(), 1000);
             }
-
-            const oldOscillators = bgmOscillators;
-            const oldGain = bgmGainNode;
-
-            bgmOscillators = [];
-            bgmGainNode = null;
-
-            setTimeout(() => {
-                oldOscillators.forEach(osc => {
-                    try { osc.stop(); } catch (e) { }
-                    osc.disconnect();
-                });
-                if (oldGain) oldGain.disconnect();
-            }, 1000);
         }
 
         // Generate retro laser pew sound
@@ -480,10 +510,17 @@
             const id = `word-${wordIdCounter++}`;
             const el = document.createElement('div');
 
+            // Random kid-friendly alien clipart (using emojis as SVGs)
+            const alienIcons = ['👾', '👽', '🛸', '🤖', '🐙', '🦠'];
+            const icon = randomItem(alienIcons);
+
             // Styling the word element
             el.id = id;
             el.className = 'falling-word game-font';
-            el.innerHTML = text; // Setup for inner HTML matching highlighting later
+            el.innerHTML = `
+                <div class="alien-clipart">${icon}</div>
+                <div class="word-text">${text}</div>
+            `;
 
             // Random styling
             const colorTheme = randomItem(wordColors);
@@ -602,16 +639,18 @@
         // Highlight letters as the kid types
         function updateHighlighting(inputString) {
             activeWords.forEach(wordObj => {
+                const textContainer = wordObj.element.querySelector('.word-text');
+
                 if (inputString.length > 0 && wordObj.text.startsWith(inputString)) {
                     // Has matching prefix
                     const matchedPart = wordObj.text.substring(0, inputString.length);
                     const restPart = wordObj.text.substring(inputString.length);
-                    wordObj.element.innerHTML = `<span class="match-highlight">${matchedPart}</span>${restPart}`;
+                    textContainer.innerHTML = `<span class="match-highlight">${matchedPart}</span>${restPart}`;
                     wordObj.element.style.transform = `translateY(${wordObj.y}px) scale(1.1)`; // Pop slightly
                     wordObj.element.style.borderColor = '#39FF14'; // Neon green border
                 } else {
                     // No match
-                    wordObj.element.innerHTML = wordObj.text;
+                    textContainer.innerHTML = wordObj.text;
                     wordObj.element.style.transform = `translateY(${wordObj.y}px) scale(1.0)`;
                     // Reset border color to original inline style or fallback
                     wordObj.element.style.borderColor = '';
