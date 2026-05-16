@@ -13,7 +13,7 @@
         body {
             margin: 0;
             overflow: hidden;
-            background-color: #0B0B2A;
+            background: linear-gradient(135deg, #1e1345 0%, #4a235a 50%, #154360 100%);
             color: white;
             font-family: 'Inter', sans-serif;
             touch-action: none;
@@ -32,17 +32,17 @@
             left: 0;
             right: 0;
             bottom: 0;
-            z-index: -1;
+            z-index: -2;
             background-image:
-                radial-gradient(2px 2px at 20px 30px, #eee, rgba(0, 0, 0, 0)),
-                radial-gradient(2px 2px at 40px 70px, #fff, rgba(0, 0, 0, 0)),
-                radial-gradient(2px 2px at 50px 160px, #ddd, rgba(0, 0, 0, 0)),
-                radial-gradient(2px 2px at 90px 40px, #fff, rgba(0, 0, 0, 0)),
-                radial-gradient(2px 2px at 130px 80px, #fff, rgba(0, 0, 0, 0)),
-                radial-gradient(2px 2px at 160px 120px, #ddd, rgba(0, 0, 0, 0));
+                radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0, 0, 0, 0)),
+                radial-gradient(3px 3px at 40px 70px, #fff3e0, rgba(0, 0, 0, 0)),
+                radial-gradient(2px 2px at 50px 160px, #e1f5fe, rgba(0, 0, 0, 0)),
+                radial-gradient(3px 3px at 90px 40px, #ffffff, rgba(0, 0, 0, 0)),
+                radial-gradient(2px 2px at 130px 80px, #fff3e0, rgba(0, 0, 0, 0)),
+                radial-gradient(3px 3px at 160px 120px, #e1f5fe, rgba(0, 0, 0, 0));
             background-repeat: repeat;
             background-size: 200px 200px;
-            animation: starsMove 100s linear infinite;
+            animation: starsMove 150s linear infinite;
         }
 
         @keyframes starsMove {
@@ -52,6 +52,152 @@
 
             to {
                 background-position: 0 1000px;
+            }
+        }
+
+        /* Kid-Friendly Solar System Planets */
+        .planet {
+            position: absolute;
+            border-radius: 50%;
+            z-index: -1;
+            opacity: 0.85;
+            animation: floatPlanet 15s ease-in-out infinite;
+        }
+
+        .planet-mercury {
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle at 30% 30%, #d4c8c1 0%, #8c7c73 100%);
+            top: 10%;
+            left: 8%;
+            box-shadow: 0 0 15px rgba(212, 200, 193, 0.4), inset -5px -5px 10px rgba(0, 0, 0, 0.2);
+            animation-duration: 11s;
+        }
+
+        .planet-venus {
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle at 30% 30%, #ffcc80 0%, #e65100 100%);
+            top: 25%;
+            right: 12%;
+            box-shadow: 0 0 20px rgba(255, 204, 128, 0.4), inset -8px -8px 15px rgba(0, 0, 0, 0.2);
+            animation-duration: 14s;
+            animation-delay: -2s;
+        }
+
+        /* Earth Base at the bottom */
+        #earth-base {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180vw;
+            height: 180vw;
+            bottom: calc(25vh - 180vw);
+            border-radius: 50%;
+            background-color: #0b1a2e;
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/c/cd/Land_ocean_ice_2048.jpg');
+            background-size: cover;
+            background-position: center top;
+            z-index: 5;
+            box-shadow: 0 -15px 50px rgba(52, 152, 219, 0.8), inset 0 40px 120px rgba(0, 0, 0, 0.9);
+            border-top: 3px solid rgba(135, 206, 235, 0.6);
+        }
+
+        @media (min-width: 768px) {
+            #earth-base {
+                width: 120vw;
+                height: 120vw;
+                bottom: calc(30vh - 120vw);
+            }
+        }
+
+        .planet-mars {
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle at 30% 30%, #ff758c 0%, #c62828 100%);
+            top: 50%;
+            left: 25%;
+            box-shadow: 0 0 20px rgba(255, 117, 140, 0.4), inset -6px -6px 12px rgba(0, 0, 0, 0.2);
+            animation-duration: 13s;
+            animation-delay: -7s;
+        }
+
+        .planet-jupiter {
+            width: 140px;
+            height: 140px;
+            background: linear-gradient(170deg, #f6d365 0%, #f6d365 20%, #fda085 20%, #fda085 40%, #e65100 40%, #e65100 50%, #fda085 50%, #fda085 75%, #f6d365 75%, #f6d365 100%);
+            bottom: 12%;
+            right: 8%;
+            box-shadow: 0 0 35px rgba(246, 211, 101, 0.4), inset -15px -15px 25px rgba(0, 0, 0, 0.4);
+            animation-duration: 20s;
+            animation-delay: -1s;
+        }
+
+        .planet-saturn {
+            width: 110px;
+            height: 110px;
+            background: radial-gradient(circle at 30% 30%, #f7e0a3 0%, #d4b56a 100%);
+            top: 15%;
+            left: 45%;
+            box-shadow: 0 0 30px rgba(247, 224, 163, 0.4), inset -12px -12px 20px rgba(0, 0, 0, 0.3);
+            animation-duration: 18s;
+            animation-delay: -9s;
+        }
+
+        .ring-saturn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 170%;
+            height: 35%;
+            border: 15px solid rgba(255, 236, 179, 0.7);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) rotate(20deg);
+            box-shadow: 0 0 15px rgba(255, 236, 179, 0.5);
+        }
+
+        .planet-uranus {
+            width: 70px;
+            height: 70px;
+            background: radial-gradient(circle at 30% 30%, #e0c3fc 0%, #8ec5fc 100%);
+            bottom: 35%;
+            right: 35%;
+            box-shadow: 0 0 25px rgba(142, 197, 252, 0.4), inset -8px -8px 15px rgba(0, 0, 0, 0.2);
+            animation-duration: 15s;
+            animation-delay: -11s;
+        }
+
+        .ring-uranus {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 140%;
+            height: 15%;
+            border: 6px solid rgba(224, 195, 252, 0.5);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) rotate(75deg);
+        }
+
+        .planet-neptune {
+            width: 75px;
+            height: 75px;
+            background: radial-gradient(circle at 30% 30%, #4facfe 0%, #000428 100%);
+            top: 60%;
+            left: 60%;
+            box-shadow: 0 0 25px rgba(79, 172, 254, 0.4), inset -10px -10px 15px rgba(0, 0, 0, 0.3);
+            animation-duration: 17s;
+            animation-delay: -4s;
+        }
+
+        @keyframes floatPlanet {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-30px) rotate(5deg);
             }
         }
 
@@ -151,9 +297,9 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: rgba(11, 11, 42, 0.9);
+            background: rgba(11, 11, 42, 0.7);
             z-index: 50;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(8px);
         }
 
         .hidden {
@@ -206,29 +352,44 @@
 
 <body class="flex flex-col h-screen w-screen overflow-hidden text-white" id="game-body">
 
+    <!-- Earth Base at the bottom -->
+    <div id="earth-base"></div>
+
+    <!-- Decorative Kid-Friendly Solar System -->
     <div class="stars"></div>
+    <div class="planet planet-mercury"></div>
+    <div class="planet planet-venus"></div>
+    <div class="planet planet-mars"></div>
+    <div class="planet planet-jupiter"></div>
+    <div class="planet planet-saturn">
+        <div class="ring-saturn"></div>
+    </div>
+    <div class="planet planet-uranus">
+        <div class="ring-uranus"></div>
+    </div>
+    <div class="planet planet-neptune"></div>
 
     <!-- Start Screen -->
     <div id="start-screen" class="screen">
-        <h1 class="text-5xl md:text-7xl mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 game-font text-center px-4"
+        <h1 class="text-5xl md:text-7xl mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-purple-400 game-font text-center px-4"
             style="-webkit-text-stroke: 1px white;">
             Space Typing<br>Defender
         </h1>
-        <p class="text-xl mb-8 text-blue-200 text-center px-4 max-w-md">
-            Protect your planet! Type the words falling from the sky to shoot them down with your laser.
+        <p class="text-xl mb-8 text-blue-100 text-center px-4 max-w-md">
+            Protect Earth! Type the words falling from the sky to shoot down the aliens with your laser.
         </p>
 
         <div class="flex flex-col md:flex-row gap-4 mt-4">
             <button id="btn-easy"
-                class="game-font text-xl px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 rounded-full shadow-[0_0_15px_rgba(16,185,129,0.5)] transform hover:scale-105 transition-all cursor-pointer">
+                class="game-font text-xl px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 rounded-full shadow-[0_0_15px_rgba(16,185,129,0.5)] transform hover:scale-105 transition-all cursor-pointer border-2 border-white/20">
                 EASY (Slow 🐢)
             </button>
             <button id="btn-medium"
-                class="game-font text-xl px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-400 hover:to-indigo-400 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.5)] transform hover:scale-105 transition-all cursor-pointer">
+                class="game-font text-xl px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-400 hover:to-indigo-400 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.5)] transform hover:scale-105 transition-all cursor-pointer border-2 border-white/20">
                 MEDIUM (Normal 🚶)
             </button>
             <button id="btn-hard"
-                class="game-font text-xl px-6 py-3 bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-400 hover:to-rose-400 rounded-full shadow-[0_0_15px_rgba(239,68,68,0.5)] transform hover:scale-105 transition-all cursor-pointer">
+                class="game-font text-xl px-6 py-3 bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-400 hover:to-rose-400 rounded-full shadow-[0_0_15px_rgba(239,68,68,0.5)] transform hover:scale-105 transition-all cursor-pointer border-2 border-white/20">
                 HARD (Fast 🚀)
             </button>
         </div>
@@ -245,11 +406,11 @@
 
         <div class="flex flex-col md:flex-row gap-4">
             <button id="restart-btn"
-                class="game-font text-2xl px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 rounded-full shadow-[0_0_20px_rgba(16,185,129,0.5)] transform hover:scale-105 transition-all cursor-pointer">
+                class="game-font text-2xl px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 rounded-full shadow-[0_0_20px_rgba(16,185,129,0.5)] transform hover:scale-105 transition-all cursor-pointer border-2 border-white/20">
                 PLAY AGAIN 🔄
             </button>
             <button id="menu-btn"
-                class="game-font text-2xl px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-full shadow-[0_0_20px_rgba(168,85,247,0.5)] transform hover:scale-105 transition-all cursor-pointer">
+                class="game-font text-2xl px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-full shadow-[0_0_20px_rgba(168,85,247,0.5)] transform hover:scale-105 transition-all cursor-pointer border-2 border-white/20">
                 MENU 🔙
             </button>
         </div>
@@ -294,7 +455,7 @@
             <div class="w-full max-w-md relative z-20 mt-4">
                 <input type="text" id="type-input" autocomplete="off" spellcheck="false"
                     placeholder="Type words here..."
-                    class="w-full text-center text-3xl md:text-4xl py-4 px-6 rounded-2xl shadow-lg game-font transition-all">
+                    class="w-full text-center text-3xl md:text-4xl py-4 px-6 rounded-2xl shadow-lg game-font transition-all bg-black/60 backdrop-blur-md">
             </div>
         </footer>
     </div>
@@ -376,11 +537,11 @@
 
         // Colors for words
         const wordColors = [
-            { bg: 'rgba(239, 68, 68, 0.2)', border: 'rgba(239, 68, 68, 0.5)' },    // Red
-            { bg: 'rgba(59, 130, 246, 0.2)', border: 'rgba(59, 130, 246, 0.5)' },  // Blue
-            { bg: 'rgba(16, 185, 129, 0.2)', border: 'rgba(16, 185, 129, 0.5)' },  // Green
-            { bg: 'rgba(245, 158, 11, 0.2)', border: 'rgba(245, 158, 11, 0.5)' },  // Yellow
-            { bg: 'rgba(168, 85, 247, 0.2)', border: 'rgba(168, 85, 247, 0.5)' }   // Purple
+            { bg: 'rgba(239, 68, 68, 0.4)', border: 'rgba(239, 68, 68, 0.8)' },    // Red
+            { bg: 'rgba(59, 130, 246, 0.4)', border: 'rgba(59, 130, 246, 0.8)' },  // Blue
+            { bg: 'rgba(16, 185, 129, 0.4)', border: 'rgba(16, 185, 129, 0.8)' },  // Green
+            { bg: 'rgba(245, 158, 11, 0.4)', border: 'rgba(245, 158, 11, 0.8)' },  // Yellow
+            { bg: 'rgba(168, 85, 247, 0.4)', border: 'rgba(168, 85, 247, 0.8)' }   // Purple
         ];
 
 
@@ -780,10 +941,10 @@
             setTimeout(() => gameBody.classList.remove('shake'), 500);
 
             // Flash red background
-            const originalBg = gameBody.style.backgroundColor;
-            gameBody.style.backgroundColor = '#450a0a';
+            const originalBg = gameBody.style.background;
+            gameBody.style.background = '#450a0a';
             setTimeout(() => {
-                gameBody.style.backgroundColor = originalBg;
+                gameBody.style.background = originalBg;
             }, 200);
 
             if (lives <= 0) {
